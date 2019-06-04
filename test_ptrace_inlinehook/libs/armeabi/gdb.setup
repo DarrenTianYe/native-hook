@@ -1,0 +1,2 @@
+set solib-search-path /home/darren/work/github/TheSevenWeapons/NativeHook/test_ptrace_inlinehook/obj/local/armeabi
+directory /home/darren/work/softeware/android-ndk-r14b/platforms/android-14/arch-arm /home/darren/work/softeware/android-ndk-r14b/sources/cxx-stl/gnu-libstdc++ /home/darren/work/github/TheSevenWeapons/NativeHook/test_ptrace_inlinehook/jni
