@@ -1,0 +1,63 @@
+1. 可以看到上面.got和.plt节的类型是PROGBITS，也就是代码。
+2. rel.dyn和.rel.plt是REL，它们是Elf32_Rel类型的结构体数据。
+3. 这就是为什么用ida查看ELF文件的时候只能看见.got和.plt节的内容，
+而用readelf查看的时候只列出来.rel.dyn和.rel.plt节的内容了。.rel.dyn节的每个表项对应了除了外部过程调用的符号以外的所有重定位对象，
+而.rel.plt节的每个表项对应了所有外部过程调用符号的重定位信息
+
+1.你的程序中需要调用一个libc中的函数，假如是strlen，直接调用的话，这个strlen符号就会在.rel.plt节中。
+
+2.在你的程序中定义一个函数指针(假如是my_strlen)指向strlen函数，那么my_strlen符号就会在.rel.dyn节中。
+
+3. .rel.plt 是R_ARM_JUMP_SLOT。
+
+.rel.dyn和.rel.plt节中每个重定位项记录了符号的符号表索引，重定位的操作地址，重定位类型的信息，
+
+.rel.plt中的类型应该都是R_ARM_JUMP_SLOT。
+
+ELF中每一个这样不确定地址的地方，都会生成一个rel表项。
+每个rel表项，都对应一个需要修正地址的地方。
+每个rel表项，都对应指出一个got表项地址。
+每个got表项用来存放找到的地址。
+当程序执行到引用变量或调用函数时：就去访问got表项找这个地址
+got表的作用是：用来存放链接器找到的 函数/变量地址。
+rel表的作用是：本程序装载进内存时，通过自己的rel表项告诉链接器，哪些地方需要重定位。
+
+
+Disassembly of section .plt:
+
+00000d8c <puts@plt>:
+ d8c:	e28fc600 	add	ip, pc, #0, 12
+ d90:	e28cca03 	add	ip, ip, #12288	; 0x3000
+ d94:	e5bcf204 	ldr	pc, [ip, #516]!	; 0x204
+
+ 1)
+ ip = d8c+8+0
+ ip = D94
+
+ 2)
+ ip = d94+3000
+ ip = 3D94
+
+ 3)
+ pc = 3d94+204
+ pc = 3F98
+
+ Disassembly of section .got:
+
+ 00003f68 <.got>:
+ 	...
+     3f78:	00002570 	andeq	r2, r0, r0, ror r5
+     3f7c:	00002470 	andeq	r2, r0, r0, ror r4
+ 	...
+     3f90:	00000d60 	andeq	r0, r0, r0, ror #26
+     3f94:	00000d60 	andeq	r0, r0, r0, ror #26
+     3f98:	00000d60 	andeq	r0, r0, r0, ror #26
+
+ Disassembly of section .rel.plt:
+
+ 00000c80 <.rel.plt>:
+  c80:	00003f90 	muleq	r0, r0, pc	; <UNPREDICTABLE>
+  c84:	00000216 	andeq	r0, r0, r6, lsl r2
+  c88:	00003f94 	muleq	r0, r4, pc	; <UNPREDICTABLE>
+  c8c:	00000116 	andeq	r0, r0, r6, lsl r1
+  c90:	00003f98 	muleq	r0, r8, pc	; <UNPREDICTABLE>
