@@ -5,6 +5,8 @@
 #include <GLES/gl.h>
 #include <elf.h>
 #include <fcntl.h>
+#include <sys/types.h>    
+#include <sys/stat.h>    
 #include <sys/mman.h>
 #include "inject_utils.h"
 
@@ -26,7 +28,7 @@ int hook_module(void* hook_addr)
 {
 
     int ret =-10;
-    old_open = hook_addr;
+    old_open = open;
     LOGD("Orig open = %p, pid:%d\n", old_open, getpid());
     void * base_addr = get_module_base(getpid(), LIBSF_PATH);
     LOGD("lib: %s ,address = %p\n", LIBSF_PATH, base_addr);
@@ -104,7 +106,7 @@ int hook_module(void* hook_addr)
 int hook_entry(char * a){
     LOGD("Hook success\n");
     LOGD("Start hooking\n");
-    int ret = hook_module(open);
+    int ret = hook_module(NULL);
     LOGD("End hooking:%d\n", ret);
     return 0;
 }

@@ -1,0 +1,2 @@
+set solib-search-path /Users/darren/work/code/github/native-hook/test_ptrace_got_hook/obj/local/armeabi-v7a
+directory /Users/darren/work/software/android-ndk-r18b/toolchains/llvm/prebuilt/darwin-x86_64/sysroot /Users/darren/work/code/github/native-hook/test_ptrace_got_hook/jni

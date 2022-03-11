@@ -1,4 +1,4 @@
-APP_STL = gnustl_shared
+#APP_STL = gnustl_shared
 APP_CPPFLAGS = -fexceptions
 APP_PLATFORM := android-14
-APP_ABI := armeabi
+APP_ABI := armeabi-v7a
